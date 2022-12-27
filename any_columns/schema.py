@@ -17,6 +17,18 @@ class Schema:
         # hashable
         object.__setattr__(self, "columns", frozenset(columns_init))
 
+    def matching_columns(self, columns: Set[str]) -> Set[Column]:
+        """
+        Get the list of columns in this schema that match the given columns
+
+        Note that you will probably also want to run columns_match() to determine if this schema is a match at all.
+        """
+        return {
+            schema_column
+            for schema_column in self.columns
+            if schema_column.matches_any(columns)
+        }
+
     def columns_match(self, columns: Set[str]) -> bool:
         """
         Check if the columns of this schema match the given columns
@@ -24,6 +36,6 @@ class Schema:
         Columns are considered a match if required columns in the schema exist in the given columns.
         """
         return all(
-            not schema_column.required or schema_column.name in columns
+            not schema_column.required or schema_column.matches_any(columns)
             for schema_column in self.columns
         )
