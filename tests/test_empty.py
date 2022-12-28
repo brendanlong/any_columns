@@ -31,14 +31,18 @@ def test_empty_columns() -> None:
 
 def test_sorted_empty_columns() -> None:
     assert (
-        find_best_matching_schemas({Schema({StringColumn("a", "column a")}, "test")}, set())
+        find_best_matching_schemas(
+            {Schema({StringColumn("a", "column a")}, "test")}, set()
+        )
         == []
     )
 
 
 def test_best_empty_columns() -> None:
     assert (
-        find_best_matching_schema({Schema({StringColumn("a", "column a")}, "test")}, set())
+        find_best_matching_schema(
+            {Schema({StringColumn("a", "column a")}, "test")}, set()
+        )
         is None
     )
 
@@ -57,7 +61,9 @@ def test_sorted_empty_columns_none_required() -> None:
 
 def test_best_empty_columns_none_required() -> None:
     schema = Schema({StringColumn("a", "column a", required=False)}, "test")
-    assert find_best_matching_schema({schema}, set()) == schema
+    assert find_best_matching_schema({schema}, set()) == SchemaMatch(
+        schema, frozendict({})
+    )
 
 
 def test_empty_schemas() -> None:

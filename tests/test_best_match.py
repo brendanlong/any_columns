@@ -19,7 +19,9 @@ def test_two_schemas_with_same_columns() -> None:
     schema_a = Schema({column_a, column_b}, "schema a")
     schema_b = Schema({column_a, column_b}, "schema b")
     with pytest.raises(AmbigiousMatch) as exc_info:
-        find_best_matching_schema({schema_a, schema_b}, {"a", "column a", "b", "column b"})
+        find_best_matching_schema(
+            {schema_a, schema_b}, {"a", "column a", "b", "column b"}
+        )
     assert exc_info.value.matches == {
         SchemaMatch(schema_a, frozendict({"column a": column_a, "column b": column_b})),
         SchemaMatch(schema_b, frozendict({"column a": column_a, "column b": column_b})),
@@ -34,7 +36,9 @@ def test_two_schemas_with_same_columns_different_required() -> None:
     schema_a = Schema({column_a_optional, column_b_required}, "schema a")
     schema_b = Schema({column_a_required, column_b_optional}, "schema b")
     with pytest.raises(AmbigiousMatch) as exc_info:
-        find_best_matching_schema({schema_a, schema_b}, {"a", "column a", "b", "column b"})
+        find_best_matching_schema(
+            {schema_a, schema_b}, {"a", "column a", "b", "column b"}
+        )
     assert exc_info.value.matches == {
         SchemaMatch(
             schema_a,
@@ -54,7 +58,9 @@ def test_two_schemas_with_same_columns_one_required() -> None:
     schema_a = Schema({column_a, column_b_required}, "schema a")
     schema_b = Schema({column_a, column_b_optional}, "schema b")
     with pytest.raises(AmbigiousMatch) as exc_info:
-        find_best_matching_schema({schema_a, schema_b}, {"a", "column a", "b", "column b"})
+        find_best_matching_schema(
+            {schema_a, schema_b}, {"a", "column a", "b", "column b"}
+        )
     assert exc_info.value.matches == {
         SchemaMatch(
             schema_a,
@@ -68,35 +74,64 @@ def test_two_schemas_with_same_columns_one_required() -> None:
 
 
 def test_two_schemas_with_different_number_columns() -> None:
-    schema_a = Schema({StringColumn("a", "column a"), StringColumn("b", "column b")}, "schema a")
+    schema_a = Schema(
+        {StringColumn("a", "column a"), StringColumn("b", "column b")}, "schema a"
+    )
     schema_b = Schema({StringColumn("a", "column a")}, "schema b")
     # schema a matches more columns so it's better than schema b
-    assert (
-        find_best_matching_schema({schema_a, schema_b}, {"a", "column a", "b", "column b"})
-        == schema_a
+    assert find_best_matching_schema(
+        {schema_a, schema_b}, {"a", "column a", "b", "column b"}
+    ) == SchemaMatch(
+        schema_a,
+        frozendict(
+            {
+                "column a": StringColumn("a", "column a"),
+                "column b": StringColumn("b", "column b"),
+            }
+        ),
     )
 
 
 def test_two_schemas_with_different_columns() -> None:
-    schema_a = Schema({StringColumn("a", "column a"), StringColumn("b", "column b")}, "schema a")
+    schema_a = Schema(
+        {StringColumn("a", "column a"), StringColumn("b", "column b")}, "schema a"
+    )
     schema_b = Schema(
-        {StringColumn("a", "column a"), StringColumn("c", "column c", required=False)}, "schema b"
-    ) 
+        {StringColumn("a", "column a"), StringColumn("c", "column c", required=False)},
+        "schema b",
+    )
     # schema a matches more columns so it's better than schema b
-    assert (
-        find_best_matching_schema({schema_a, schema_b}, {"a", "column a", "b", "column b"})
-        == schema_a
+    assert find_best_matching_schema(
+        {schema_a, schema_b}, {"a", "column a", "b", "column b"}
+    ) == SchemaMatch(
+        schema_a,
+        frozendict(
+            {
+                "column a": StringColumn("a", "column a"),
+                "column b": StringColumn("b", "column b"),
+            }
+        ),
     )
 
 
 def test_two_schemas_skip_unmatched() -> None:
     # In this one, schema a has more matching columns, but it's missing a required column so schema b is the best match
     schema_a = Schema(
-        {StringColumn("a", "column a"), StringColumn("b", "column b"), StringColumn("c", "column c")},
+        {
+            StringColumn("a", "column a"),
+            StringColumn("b", "column b"),
+            StringColumn("c", "column c"),
+        },
         "schema a",
     )
     schema_b = Schema({StringColumn("a", "column a")}, "schema b")
-    assert (
-        find_best_matching_schema({schema_a, schema_b}, {"a", "column a", "b", "column b"})
-        == schema_b
+    assert find_best_matching_schema(
+        {schema_a, schema_b}, {"a", "column a", "b", "column b"}
+    ) == SchemaMatch(
+        schema_b,
+        frozendict(
+            {
+                "column a": StringColumn("a", "column a"),
+            }
+        ),
     )

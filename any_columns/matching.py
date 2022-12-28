@@ -48,7 +48,7 @@ class AmbigiousMatch(Exception):
 
 def find_best_matching_schema(
     schemas: Set[Schema], columns: Set[str]
-) -> Optional[Schema]:
+) -> Optional[SchemaMatch]:
     """
     Find the one best matching schema for the given set of columns
 
@@ -73,4 +73,4 @@ def find_best_matching_schema(
     if len(matches) > 1:
         raise AmbigiousMatch(matches)
 
-    return matches[0].schema
+    return matches[0]
