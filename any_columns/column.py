@@ -13,7 +13,8 @@ class AmbigiousColumn(Exception):
 class ColumnDefinition(ABC):
     """A single column in a spreadsheet"""
 
-    def __init__(self, required: bool = True):
+    def __init__(self, name: str, required: bool = True):
+        self.name = name
         self.required = required
 
     @abstractmethod

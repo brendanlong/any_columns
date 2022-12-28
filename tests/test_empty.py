@@ -24,27 +24,27 @@ def test_best_empty_schemas_and_columns() -> None:
 
 def test_empty_columns() -> None:
     assert (
-        find_matching_schemas({Schema({StringColumn("column a")}, "test")}, set())
+        find_matching_schemas({Schema({StringColumn("a", "column a")}, "test")}, set())
         == set()
     )
 
 
 def test_sorted_empty_columns() -> None:
     assert (
-        find_best_matching_schemas({Schema({StringColumn("column a")}, "test")}, set())
+        find_best_matching_schemas({Schema({StringColumn("a", "column a")}, "test")}, set())
         == []
     )
 
 
 def test_best_empty_columns() -> None:
     assert (
-        find_best_matching_schema({Schema({StringColumn("column a")}, "test")}, set())
+        find_best_matching_schema({Schema({StringColumn("a", "column a")}, "test")}, set())
         is None
     )
 
 
 def test_empty_columns_none_required() -> None:
-    schema = Schema({StringColumn("column a", required=False)}, "test")
+    schema = Schema({StringColumn("a", "column a", required=False)}, "test")
     assert find_matching_schemas({schema}, set()) == {schema}
 
 
@@ -56,17 +56,17 @@ def test_sorted_empty_columns_none_required() -> None:
 
 
 def test_best_empty_columns_none_required() -> None:
-    schema = Schema({StringColumn("column a", required=False)}, "test")
+    schema = Schema({StringColumn("a", "column a", required=False)}, "test")
     assert find_best_matching_schema({schema}, set()) == schema
 
 
 def test_empty_schemas() -> None:
-    assert find_matching_schemas(set(), {"column a"}) == set()
+    assert find_matching_schemas(set(), {"a", "column a"}) == set()
 
 
 def test_sorted_empty_schemas() -> None:
-    assert find_best_matching_schemas(set(), {"column a"}) == []
+    assert find_best_matching_schemas(set(), {"a", "column a"}) == []
 
 
 def test_best_empty_schemas() -> None:
-    assert find_best_matching_schema(set(), {"column a"}) is None
+    assert find_best_matching_schema(set(), {"a", "column a"}) is None

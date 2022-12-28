@@ -8,15 +8,18 @@ class RegexColumn(ColumnDefinition):
     """
     A single column in a spreadsheet identified by a regex
 
+    A regex will match if it is found anywhere in the column name. Use ^ and $ if you want to require that the regex
+    matches the entire column name.
+
     Note that StringColumn should be preferred where possible because it's much more efficient.
     """
 
-    def __init__(self, pattern: re.Pattern, required: bool = True):
-        super().__init__(required)
+    def __init__(self, name: str, pattern: re.Pattern, required: bool = True):
+        super().__init__(name, required)
         self.pattern = pattern
 
     def _key(self) -> Any:
-        return (self.pattern, self.required)
+        return (self.name, self.pattern, self.required)
 
     def __hash__(self) -> int:
         return hash(self._key())
@@ -39,7 +42,7 @@ class RegexColumn(ColumnDefinition):
                 return None
 
         matching_columns = {
-            column for column in others if self.pattern.fullmatch(column)
+            column for column in others if self.pattern.search(column)
         }
         if len(matching_columns) > 1:
             raise AmbigiousColumn(self, matching_columns)
