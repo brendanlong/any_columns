@@ -5,7 +5,7 @@ import pytest
 
 from .context import (
     AmbigiousMatch,
-    Column,
+    ColumnDefinition,
     StringColumn,
     Schema,
     SchemaMatch,

@@ -5,8 +5,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from any_columns import (
     AmbigiousMatch,
-    Column,
-    RegexColumn,
+    ColumnDefinition,
+    RegexColumnDefinition,
     StringColumn,
     Schema,
     SchemaMatch,

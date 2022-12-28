@@ -3,14 +3,14 @@ from typing import List, Optional, Set
 
 from frozendict import frozendict  # type: ignore[attr-defined]
 
-from .column import Column
+from .column import ColumnDefinition
 from .schema import Schema
 
 
 @dataclass(frozen=True)
 class SchemaMatch:
     schema: Schema
-    matching_columns: frozendict[str, Column]
+    matching_columns: frozendict[str, ColumnDefinition]
 
 
 def find_best_matching_schemas(

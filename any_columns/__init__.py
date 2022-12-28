@@ -1,5 +1,5 @@
-from .column import AmbigiousColumn, Column
-from .regex_column import RegexColumn
+from .column import AmbigiousColumn, ColumnDefinition
+from .regex_column import RegexColumnDefinition
 from .string_column import StringColumn
 from .schema import AmbigiousColumns, Schema
 from .matching import (

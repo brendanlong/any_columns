@@ -4,19 +4,19 @@ from typing import FrozenSet, Set
 
 from frozendict import frozendict  # type: ignore[attr-defined]
 
-from .column import Column
+from .column import ColumnDefinition
 
 
 @dataclass(frozen=True)
 class SchemaMatch:
     matches: bool
-    matching_columns: frozendict[str, Column]
+    matching_columns: frozendict[str, ColumnDefinition]
 
 
 class AmbigiousColumns(Exception):
     """Raised if more than one Column definition matches the same column in a Schema"""
 
-    def __init__(self, schema: "Schema", column_name: str, column_matches: Set[Column]):
+    def __init__(self, schema: "Schema", column_name: str, column_matches: Set[ColumnDefinition]):
         self.schema = schema
         self.column_name = column_name
         self.column_matches = column_matches
@@ -26,11 +26,11 @@ class AmbigiousColumns(Exception):
 class Schema:
     """The schema of a spreadsheet, with a set of columns and a name to identify the schema to humans"""
 
-    columns: FrozenSet[Column] = field(init=False)
-    columns_init: InitVar[Set[Column]]
+    columns: FrozenSet[ColumnDefinition] = field(init=False)
+    columns_init: InitVar[Set[ColumnDefinition]]
     name: str
 
-    def __post_init__(self, columns_init: Set[Column]) -> None:
+    def __post_init__(self, columns_init: Set[ColumnDefinition]) -> None:
         # Accept a Set[Column] argument and transparently turn it into a FrozenSet[Column] argument to make this class
         # hashable
         object.__setattr__(self, "columns", frozenset(columns_init))

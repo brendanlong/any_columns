@@ -1,9 +1,9 @@
 from typing import Any, Optional, Set
 
-from .column import Column
+from .column import ColumnDefinition
 
 
-class StringColumn(Column):
+class StringColumn(ColumnDefinition):
     """
     A single column in a spreadsheet identified by an exact string
     """
@@ -25,7 +25,7 @@ class StringColumn(Column):
 
     def matching_column(self, others: Set[str]) -> Optional[str]:
         """
-        Finds the column matching this one in a set of column names if one exists
+        Finds the column matching this definition in a set of column names if one exists
 
         Will never raise `AmbigiousColumn`
         """

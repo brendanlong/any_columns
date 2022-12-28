@@ -1,10 +1,10 @@
 from typing import Any, Optional, Set
 import re
 
-from .column import AmbigiousColumn, Column
+from .column import AmbigiousColumn, ColumnDefinition
 
 
-class RegexColumn(Column):
+class RegexColumn(ColumnDefinition):
     """
     A single column in a spreadsheet identified by a regex
 
@@ -28,7 +28,7 @@ class RegexColumn(Column):
 
     def matching_column(self, others: Set[str]) -> Optional[str]:
         """
-        Finds the column matching this one in a set of column names if one exists
+        Finds the column matching this definition in a set of column names if one exists
 
         Raises `AmbigiousColumn` if more than one column matches
         """
