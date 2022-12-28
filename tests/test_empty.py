@@ -1,5 +1,7 @@
+from frozendict import frozendict  # type: ignore[attr-defined]
+
 from .context import (
-    Column,
+    StringColumn,
     Schema,
     SchemaMatch,
     find_best_matching_schema,
@@ -21,33 +23,40 @@ def test_best_empty_schemas_and_columns() -> None:
 
 
 def test_empty_columns() -> None:
-    assert find_matching_schemas({Schema({Column("column a")}, "test")}, set()) == set()
+    assert (
+        find_matching_schemas({Schema({StringColumn("column a")}, "test")}, set())
+        == set()
+    )
 
 
 def test_sorted_empty_columns() -> None:
     assert (
-        find_best_matching_schemas({Schema({Column("column a")}, "test")}, set()) == []
+        find_best_matching_schemas({Schema({StringColumn("column a")}, "test")}, set())
+        == []
     )
 
 
 def test_best_empty_columns() -> None:
     assert (
-        find_best_matching_schema({Schema({Column("column a")}, "test")}, set()) is None
+        find_best_matching_schema({Schema({StringColumn("column a")}, "test")}, set())
+        is None
     )
 
 
 def test_empty_columns_none_required() -> None:
-    schema = Schema({Column("column a", required=False)}, "test")
+    schema = Schema({StringColumn("column a", required=False)}, "test")
     assert find_matching_schemas({schema}, set()) == {schema}
 
 
 def test_sorted_empty_columns_none_required() -> None:
     schema = Schema({}, "test")
-    assert find_best_matching_schemas({schema}, set()) == [SchemaMatch(schema, set())]
+    assert find_best_matching_schemas({schema}, set()) == [
+        SchemaMatch(schema, frozendict({}))
+    ]
 
 
 def test_best_empty_columns_none_required() -> None:
-    schema = Schema({Column("column a", required=False)}, "test")
+    schema = Schema({StringColumn("column a", required=False)}, "test")
     assert find_best_matching_schema({schema}, set()) == schema
 
 

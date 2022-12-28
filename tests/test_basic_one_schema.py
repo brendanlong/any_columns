@@ -1,5 +1,7 @@
+from frozendict import frozendict  # type: ignore[attr-defined]
+
 from .context import (
-    Column,
+    StringColumn,
     Schema,
     SchemaMatch,
     find_best_matching_schema,
@@ -9,25 +11,27 @@ from .context import (
 
 
 def test_one_column_exact() -> None:
-    schema = Schema({Column("column a")}, "test")
+    schema = Schema({StringColumn("column a")}, "test")
     assert find_matching_schemas({schema}, {"column a"}) == {schema}
 
 
 def test_sorted_one_column_exact() -> None:
-    column = Column("column a")
-    schema = Schema({Column("column a")}, "test")
+    column = StringColumn("column a")
+    schema = Schema({StringColumn("column a")}, "test")
     assert find_best_matching_schemas({schema}, {"column a"}) == [
-        SchemaMatch(schema, {column})
+        SchemaMatch(schema, frozendict({"column a": column}))
     ]
 
 
 def test_best_one_column_exact() -> None:
-    schema = Schema({Column("column a")}, "test")
+    schema = Schema({StringColumn("column a")}, "test")
     assert find_best_matching_schema({schema}, {"column a"}) == schema
 
 
 def test_two_columns_one_required_one_given() -> None:
-    schema = Schema({Column("column a"), Column("column b", required=False)}, "test")
+    schema = Schema(
+        {StringColumn("column a"), StringColumn("column b", required=False)}, "test"
+    )
     assert find_matching_schemas(
         {schema},
         {"column a"},
@@ -35,16 +39,18 @@ def test_two_columns_one_required_one_given() -> None:
 
 
 def test_sorted_two_columns_one_required_one_given() -> None:
-    column_a = Column("column a")
-    schema = Schema({column_a, Column("column b", required=False)}, "test")
+    column_a = StringColumn("column a")
+    schema = Schema({column_a, StringColumn("column b", required=False)}, "test")
     assert find_best_matching_schemas(
         {schema},
         {"column a"},
-    ) == [SchemaMatch(schema, {column_a})]
+    ) == [SchemaMatch(schema, frozendict({"column a": column_a}))]
 
 
 def test_best_two_columns_one_required_one_given() -> None:
-    schema = Schema({Column("column a"), Column("column b", required=False)}, "test")
+    schema = Schema(
+        {StringColumn("column a"), StringColumn("column b", required=False)}, "test"
+    )
     assert (
         find_best_matching_schema(
             {schema},
@@ -55,7 +61,7 @@ def test_best_two_columns_one_required_one_given() -> None:
 
 
 def test_two_columns_two_required_one_given() -> None:
-    schema = Schema({Column("column a"), Column("column b")}, "test")
+    schema = Schema({StringColumn("column a"), StringColumn("column b")}, "test")
     assert (
         find_matching_schemas(
             {schema},
@@ -66,7 +72,7 @@ def test_two_columns_two_required_one_given() -> None:
 
 
 def test_sorted_two_columns_two_required_one_given() -> None:
-    schema = Schema({Column("column a"), Column("column b")}, "test")
+    schema = Schema({StringColumn("column a"), StringColumn("column b")}, "test")
     assert (
         find_best_matching_schemas(
             {schema},
@@ -77,7 +83,7 @@ def test_sorted_two_columns_two_required_one_given() -> None:
 
 
 def test_best_two_columns_two_required_one_given() -> None:
-    schema = Schema({Column("column a"), Column("column b")}, "test")
+    schema = Schema({StringColumn("column a"), StringColumn("column b")}, "test")
     assert (
         find_best_matching_schema(
             {schema},
@@ -88,7 +94,7 @@ def test_best_two_columns_two_required_one_given() -> None:
 
 
 def test_two_columns_two_required_two_given() -> None:
-    schema = Schema({Column("column a"), Column("column b")}, "test")
+    schema = Schema({StringColumn("column a"), StringColumn("column b")}, "test")
     assert find_matching_schemas(
         {schema},
         {"column a", "column b"},
@@ -96,16 +102,17 @@ def test_two_columns_two_required_two_given() -> None:
 
 
 def test_sorted_two_columns_two_required_two_given() -> None:
-    columns = {Column("column a"), Column("column b")}
-    schema = Schema(columns, "test")
+    column_a = StringColumn("column a")
+    column_b = StringColumn("column b")
+    schema = Schema({column_a, column_b}, "test")
     assert find_best_matching_schemas(
         {schema},
         {"column a", "column b"},
-    ) == [SchemaMatch(schema, columns)]
+    ) == [SchemaMatch(schema, frozendict({"column a": column_a, "column b": column_b}))]
 
 
 def test_best_two_columns_two_required_two_given() -> None:
-    schema = Schema({Column("column a"), Column("column b")}, "test")
+    schema = Schema({StringColumn("column a"), StringColumn("column b")}, "test")
     assert (
         find_best_matching_schema(
             {schema},

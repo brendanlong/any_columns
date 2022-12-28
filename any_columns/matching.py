@@ -1,28 +1,16 @@
 from dataclasses import dataclass
-from typing import FrozenSet, List, Optional, Set
+from typing import List, Optional, Set
+
+from frozendict import frozendict  # type: ignore[attr-defined]
 
 from .column import Column
 from .schema import Schema
 
 
-def find_matching_schemas(schemas: Set[Schema], columns: Set[str]) -> Set[Schema]:
-    """
-    Find all schemas from the given set of schemas that match the given set of columns
-
-    See `find_best_matching_schemas` if you care about best matches"""
-    return {schema for schema in schemas if schema.columns_match(columns)}
-
-
 @dataclass(frozen=True)
 class SchemaMatch:
-    """
-    A schema and the columns that it matched in the given columns
-
-    This can be used to determine which schema is the best match for an input.
-    """
-
     schema: Schema
-    matching_columns: FrozenSet[Column]
+    matching_columns: frozendict[str, Column]
 
 
 def find_best_matching_schemas(
@@ -34,15 +22,21 @@ def find_best_matching_schemas(
 
     Schemas that don't match at all (are missing required columns) will not be returned.
     """
-    matching_schemas = find_matching_schemas(schemas, columns)
-    matching_schemas_with_columns = [
-        SchemaMatch(schema, frozenset(schema.matching_columns(columns)))
-        for schema in matching_schemas
-    ]
-    matching_schemas_with_columns.sort(
-        key=lambda match: len(match.matching_columns), reverse=True
-    )
-    return matching_schemas_with_columns
+    matches = []
+    for schema in schemas:
+        schema_match = schema.match_columns(columns)
+        if schema_match.matches:
+            matches.append(SchemaMatch(schema, schema_match.matching_columns))
+    matches.sort(key=lambda match: len(match.matching_columns), reverse=True)
+    return matches
+
+
+def find_matching_schemas(schemas: Set[Schema], columns: Set[str]) -> Set[Schema]:
+    """
+    Find all schemas from the given set of schemas that match the given set of columns
+
+    See `find_best_matching_schemas` if you care about best matches"""
+    return {match.schema for match in find_best_matching_schemas(schemas, columns)}
 
 
 class AmbigiousMatch(Exception):

@@ -1,14 +1,38 @@
-from dataclasses import dataclass
-from typing import Set
+from abc import ABC, abstractmethod
+from typing import Any, Optional, Set
 
 
-@dataclass(frozen=True)
-class Column:
+class AmbigiousColumn(Exception):
+    """Exception raised if a Column definition matches more than one column header in the input"""
+
+    def __init__(self, column: "Column", matching_columns: Set[str]):
+        self.column = column
+        self.matching_columns = matching_columns
+
+
+class Column(ABC):
     """A single column in a spreadsheet"""
 
-    name: str
-    required: bool = True
+    def __init__(self, required: bool = True):
+        self.required = required
 
-    def matches_any(self, others: Set[str]) -> bool:
-        """Determine if this column matches any of the input columns"""
-        return self.name in others
+    @abstractmethod
+    def matching_column(self, others: Set[str]) -> Optional[str]:
+        """
+        Finds the column matching this one in a set of column names if one exists
+
+        Raises `AmbigiousColumn` if more than one column matches
+        """
+        pass
+
+    @abstractmethod
+    def _key(self) -> Any:
+        pass
+
+    @abstractmethod
+    def __hash__(self) -> int:
+        pass
+
+    @abstractmethod
+    def __eq__(self, other) -> bool:
+        pass
